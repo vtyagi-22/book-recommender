@@ -9,11 +9,12 @@ from urllib.parse import  quote
 book=pickle.load(open('movies.pkl','rb'))
 model=pickle.load(open('model.pkl','rb'))
 vectors=pickle.load(open('vectors.pkl','rb'))
+df=pickle.load(open('df.pkl','rb'))
 
 @st.cache_data
 def poster(title):
     search_title=quote(title[:50])
-    url=  f"https://www.googleapis.com/books/v1/volumes?q={title}"
+    url= df[df['title']==title['img'].values[0]]
     data= requests.get(url).json()
     try:
 
@@ -61,7 +62,8 @@ if st.button("Recommend"):
     cols=st.columns(5)
     for i in range(5):
         with cols[i]:
-            st.image(covers[i])
-            st.write(recommendation[i])
+            img_url=poster(recommendation[i])
+            st.image(img_url)
+            st.text(recommendation[i])
 
 
