@@ -31,7 +31,11 @@ def recom(bk_title):
     book_cover=[]
     for i in indices[0][1:]:
         recomnd_book.append(book.iloc[i].title)
-        book_cover.append(poster(book.iloc[i].title))
+        url = book.iloc[i].image_url_l
+        url = url.replace("http://", "https://")
+
+        book_cover.append(url)
+
     return recomnd_book,book_cover
 
 
