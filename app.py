@@ -1,69 +1,60 @@
 import streamlit as st
 import pickle
 import pandas as pd
-import sklearn as sk
-import requests
-from urllib.parse import  quote
 
-
-book=pickle.load(open('movies.pkl','rb'))
-model=pickle.load(open('model.pkl','rb'))
-vectors=pickle.load(open('vectors.pkl','rb'))
+# Load files
+# Ensure movies.pkl contains the 'title' and 'img' columns
+book = pickle.load(open('movies.pkl', 'rb'))
+model = pickle.load(open('model.pkl', 'rb'))
+vectors = pickle.load(open('vectors.pkl', 'rb'))
+bk=pickle.load(open('bk.pkl', 'rb'))
 
 
 @st.cache_data
-def poster(title):
-    search_title=quote(title[:50])
-    url= book[book['title']==title['img'].values[0]]
-    data= requests.get(url).json()
+def get_poster(title):
     try:
+        # Find the URL in the 'img' column for the matching title
+        # We use .iloc[0] to get the actual string value
+        url = bk[bk['title'] == title]['img'].values[0]
 
-        response = requests.get(url, timeout=5)
-        data = response.json()
-
-        if 'items' in data:
-
-            volume_info = data['items'][0].get('volumeInfo', {})
-            image_links = volume_info.get('imageLinks', {})
-            cover = image_links.get('thumbnail')
-
-            if cover:
-                return cover.replace("http://", "https://")
-    except Exception as e:
-        print(f"Error for {title}: {e}")
-
-
+        # Streamlit Cloud requires HTTPS
+        if isinstance(url, str):
+            return url.replace("http://", "https://")
+    except Exception:
+        pass
+    # Fallback placeholder if URL is missing or broken
     return "https://placehold.co/128x195?text=No+Cover"
 
 
-
-
-
 def recom(bk_title):
+    # Find index of the book
     indx = book[book['title'].str.contains(bk_title, case=False)].index[0]
     distance, indices = model.kneighbors(vectors[indx], n_neighbors=6)
-    recomnd_book=[]
-    book_cover=[]
+
+    recomnd_book = []
+    book_cover = []
+
     for i in indices[0][1:]:
-        recomnd_book.append(book.iloc[i].title)
-        book_cover.append(poster(book.iloc[i].title))
+        title = book.iloc[i].title
+        recomnd_book.append(title)
+        # Fetch the cover URL directly from our function
+        book_cover.append(get_poster(title))
 
-    return recomnd_book,book_cover
+    return recomnd_book, book_cover
 
 
-book_list=book['title'].values
-
+# UI Code
 st.title('Book Recommender System')
 
-slect_book=st.selectbox("Select a book",book_list)
+book_list = book['title'].values
+slect_book = st.selectbox("Select a book", book_list)
 
 if st.button("Recommend"):
-    recommendation,covers=recom(slect_book)
-    cols=st.columns(5)
+    recommendation, covers = recom(slect_book)
+
+    cols = st.columns(5)
     for i in range(5):
         with cols[i]:
-            img_url=poster(recommendation[i])
-            st.image(img_url)
+            # Use the covers list returned by recom()
+            st.image(covers[i])
             st.text(recommendation[i])
-
-
