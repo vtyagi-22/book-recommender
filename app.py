@@ -3,23 +3,36 @@ import pickle
 import pandas as pd
 import sklearn as sk
 import requests
-
-
+from urllib.parse import  quote
 
 
 book=pickle.load(open('movies.pkl','rb'))
 model=pickle.load(open('model.pkl','rb'))
 vectors=pickle.load(open('vectors.pkl','rb'))
 
+@st.cache_data
 def poster(title):
+    search_title=quote(title[:50])
     url=  f"https://www.googleapis.com/books/v1/volumes?q={title}"
     data= requests.get(url).json()
     try:
-         cover=data['items'][0]['volumeInfo']['imageLinks']['thumbnail']
-         cover = cover.replace("http://", "https://")
-    except:
-         cover="https://via.placeholder.com/128x195.png?text=No+Cover"
-    return cover
+
+        response = requests.get(url, timeout=5)
+        data = response.json()
+
+        if 'items' in data:
+
+            volume_info = data['items'][0].get('volumeInfo', {})
+            image_links = volume_info.get('imageLinks', {})
+            cover = image_links.get('thumbnail')
+
+            if cover:
+                return cover.replace("http://", "https://")
+    except Exception as e:
+        print(f"Error for {title}: {e}")
+
+
+    return "https://placehold.co/128x195?text=No+Cover"
 
 
 
