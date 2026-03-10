@@ -16,6 +16,7 @@ def poster(title):
     data= requests.get(url).json()
     try:
          cover=data['items'][0]['volumeInfo']['imageLinks']['thumbnail']
+         cover = cover.replace("http://", "https://")
     except:
          cover="https://via.placeholder.com/128x195.png?text=No+Cover"
     return cover
@@ -31,10 +32,7 @@ def recom(bk_title):
     book_cover=[]
     for i in indices[0][1:]:
         recomnd_book.append(book.iloc[i].title)
-        url = book.iloc[i].image_url_l
-        url = url.replace("http://", "https://")
-
-        book_cover.append(url)
+        book_cover.append(poster(book.iloc[i].title))
 
     return recomnd_book,book_cover
 
