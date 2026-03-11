@@ -4,7 +4,7 @@
 
 As a book reader, I often faced difficulty deciding what to read next. Many platforms provide generic recommendations instead of suggesting books based on actual similarity.
 
-To solve this problem, I built a **Book Recommendation System** that recommends books similar to a selected book using **machine learning techniques**.
+To solve this problem, I built a **Book Recommendation System** that recommends books similar to a selected book on basis of genre and description using **machine learning techniques**.
 
 The system converts books into **numerical vectors** and uses **K-Nearest Neighbors (KNN)** with **Cosine Similarity** to find the most similar books.
 
