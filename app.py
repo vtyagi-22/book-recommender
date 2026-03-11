@@ -3,7 +3,7 @@ import pickle
 import pandas as pd
 
 
-book = pickle.load(open('movies.pkl', 'rb'))
+book = pickle.load(open('book.pkl', 'rb'))
 model = pickle.load(open('model.pkl', 'rb'))
 vectors = pickle.load(open('vectors.pkl', 'rb'))
 bk=pickle.load(open('bk.pkl', 'rb'))
